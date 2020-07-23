@@ -24,7 +24,19 @@ public class Catalog {
      */
     public Catalog() {
         // some code goes here
+        idTables = new HashMap<>(10);
+        nameTables = new HashMap<>(10);
+        dbFilePkeyFields = new HashMap<>(10);
+        dbFileDbName = new HashMap<>(10);
     }
+
+    private Map<Integer, DbFile> idTables;
+
+    private Map<String, DbFile> nameTables;
+
+    private Map<DbFile, String> dbFilePkeyFields;
+
+    private Map<DbFile, String> dbFileDbName;
 
     /**
      * Add a new table to the catalog.
@@ -37,6 +49,10 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // some code goes here
+        idTables.put(file.getId(), file);
+        dbFileDbName.put(file, name);
+        dbFilePkeyFields.put(file, pkeyField);
+        nameTables.put(name, file);
     }
 
     public void addTable(DbFile file, String name) {
@@ -60,7 +76,10 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // some code goes here
-        return 0;
+        if (!nameTables.containsKey(name)) {
+            throw new NoSuchElementException();
+        }
+        return nameTables.get(name).getId();
     }
 
     /**
@@ -71,7 +90,7 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        return getDatabaseFile(tableid).getTupleDesc();
     }
 
     /**
@@ -82,27 +101,34 @@ public class Catalog {
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        if (!idTables.containsKey(tableid)) {
+            throw new NoSuchElementException();
+        }
+        return idTables.get(tableid);
     }
 
     public String getPrimaryKey(int tableid) {
         // some code goes here
-        return null;
+        return dbFilePkeyFields.get(getDatabaseFile(tableid));
     }
 
     public Iterator<Integer> tableIdIterator() {
         // some code goes here
-        return null;
+        return idTables.keySet().iterator();
     }
 
     public String getTableName(int id) {
         // some code goes here
-        return null;
+        return dbFileDbName.get(getDatabaseFile(id));
     }
     
     /** Delete all tables from the catalog */
     public void clear() {
         // some code goes here
+        dbFileDbName.clear();
+        dbFilePkeyFields.clear();
+        idTables.clear();
+        nameTables.clear();
     }
     
     /**
